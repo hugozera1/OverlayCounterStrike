@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
 
+import { CircleDollarSign, HeartCrack, Shield, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import Ctchar from './assets/CTchar.png';
+import TRChar from './assets/TRChar.png'
 interface Player {
   name: string;
   team: string;
   state: {
     health: number;
+    helmet: boolean;
     armor: number;
     money: number;
   };
@@ -48,103 +52,114 @@ export default function App() {
 
   // 🔹 BOX compacto
   const compactBoxStyle =
-    "p-1.5 rounded-lg border mb-1 w-28 h-auto text-xs";
+    "p-1.5  border mb-1 w-30  text-xs flex-col h-30";
+     const compactBoxStyle2 =
+    "p-1 border-0 m-0 w-60 text-xs flex-col h-50"; 
 
   const renderCharBox = (c: Player, index: number) => {
-    const activeWeapon =
-      Object.values(c.weapons).find((w) => w.state === "active")?.name || "none";
-      const active = Object.values(c.weapons).find(w => w.state === "active");
+  console.log("ARMOR:", c.state.armor, "HELMET:", c.state.helmet, "PLAYER:", c.name);
 
-const ammoClip = active?.ammo_clip ?? 0;
-const ammoReserve = active?.ammo_reserve ?? 0;
+  const activeWeapon =
+    Object.values(c.weapons).find((w) => w.state === "active")?.name || "none";
+  const active = Object.values(c.weapons).find(w => w.state === "active");
 
+  const ammoClip = active?.ammo_clip ?? 0;
+  const ammoReserve = active?.ammo_reserve ?? 0;
 
-    return (
-      <div
-        key={index}
-        className={`${compactBoxStyle}
-        ${
-          c.state.health === 0
-            ? "border-gray-700 bg-gray-900"
-            : c.team === "CT"
-            ? "border-blue-500 bg-blue-800"
-            : "border-red-500 bg-red-800"
-        }`}
-      >
-        <div className="flex justify-between mb-1">
-          <h2 className="font-bold text-base">{c.name}</h2>
-          <span
-            className={`px-2 py-0.5 rounded text-xs ${
-              c.team === "CT" ? "bg-blue-600" : "bg-red-600"
-            }`}
-          >
-            {c.team}
-          </span>
-        </div>
-
-        <p className="text-red-400">HP: <span className="text-white">{c.state.health}</span></p>
-        <p className="text-blue-400">Armor: <span className="text-white">{c.state.armor}</span></p>
-        <p className="text-yellow-300">Money: <span className="text-white">${c.state.money}</span></p>
-        <p className="text-purple-300">Gun: <span className="text-white">{activeWeapon}</span></p>
-        <p className="text-green-300">Ammo: <span className="text-white">{ammoClip}/{ammoReserve}</span></p>
-
-        <div className="mt-1 h-1.5 w-full bg-gray-700 rounded">
-          <div
-            className="h-full rounded"
-            style={{
-              width: `${c.state.health}%`,
-              backgroundColor: c.team === "CT" ? "#3b82f6" : "#ef4444",
-            }}
-          ></div>
-        </div>
+  return (
+    <div
+      key={index}
+      className={`flex flex-col m-0 p-0 w-70 h-full ${
+        c.state.health === 0
+          ? "bg-gray-900"
+          : c.team === "CT"
+          ? "bg-blue-800"
+          : "bg-orange-500"
+      }`}
+    >
+      {/* Imagem do jogador com fade vertical */}
+      <div className="relative w-full h-30 overflow-hidden m-0 p-0">
+        <img
+          src={c.team === "CT" ? Ctchar : TRChar}
+          alt={c.team === "CT" ? "CT logo" : "T logo"}
+          className="w-full h-full object-cover"
+        />
+        <div
+          className={`absolute inset-0 ${
+            c.team === "CT"
+              ? "bg-gradient-to-t from-blue-900/80 to-transparent"
+              : "bg-gradient-to-t from-red-900/80 to-transparent"
+          }`}
+        />
       </div>
-    );
-  };
+    
+
+      {/* HUD com stats */}
+      <div className="flex w-full justify-between items-center gap-0 p-0  bg-neutral-900">
+        {/* HP */}
+        <p className="text-red-400 flex items-center gap-1 m-0 p-0">
+          <HeartCrack /> <span className="text-white">{c.state.health}</span>
+        </p>
+
+        {/* Armor / Capacete */}
+        {c.state.armor > 0 && (
+          <p className="text-blue-400 flex items-center gap-0 m-0 p-0">
+            {c.state.helmet ? <ShieldCheck size={16} /> : <Shield size={16} />}
+          </p>
+        )}
+
+        {/* Nome */}
+        <h2 className="font-bold text-base text-white m-0 p-0">{c.name}</h2>
+
+        {/* Ammo */}
+        <p className="text-green-300 flex items-center gap-0 m-0 p-0">
+          <span className="text-white">{ammoClip}/{ammoReserve}</span>
+        </p>
+      </div>
+    </div>
+  );
+};
+
 
   const renderPlayerBox = (p: Player, index: number) => {
-    const activeWeapon =
-      Object.values(p.weapons).find((w) => w.state === "active")?.name || "none";
+  const activeWeapon =
+    Object.values(p.weapons).find((w) => w.state === "active")?.name || "none";
 
-    return (
+  return (
+    <div
+      key={index}
+      className={`relative w-30 h-40 border border-gray-700 bg-gray-900 overflow-hidden flex flex-col justify-end text-white text-xs`}
+    >
+      {/* Vida do jogador via altura do background */}
       <div
-        key={index}
-        className={`${compactBoxStyle}
-        ${
-          p.state.health === 0
-            ? "border-gray-700 bg-gray-900"
-            : p.team === "CT"
-            ? "border-blue-500 bg-blue-800"
-            : "border-red-500 bg-red-800"
+        className={`absolute bottom-0 w-full ${
+          p.team === "CT" ? "bg-blue-500/50" : "bg-red-500/50"
         }`}
-      >
-        <div className="flex justify-between mb-1">
-          <h2 className="font-bold text-base">{p.name}</h2>
-          <span
-            className={`px-2 py-0.5 rounded text-xs ${
-              p.team === "CT" ? "bg-blue-600" : "bg-red-600"
-            }`}
-          >
-            {p.team}
-          </span>
-        </div>
+        style={{
+          height: `${p.state.health}%`,
+          transition: "height 0.2s ease-in-out",
+        }}
+      />
 
-        <p className="text-red-400">HP: <span className="text-white">{p.state.health}</span></p>
-        <p className="text-blue-400">Armor: <span className="text-white">{p.state.armor}</span></p>
+      {/* Conteúdo do jogador */}
+      <div className="relative z-10 flex flex-col justify-between h-full p-1 gap-0">
+        <h2 className="font-bold text-base">{p.name}</h2>
+
+        <p className="text-red-400 flex items-center gap-1 m-0 p-0">
+          <HeartCrack /> <span className="text-white">{p.state.health}</span>
+        </p>
+
+        <p className="text-blue-400 flex items-center gap-1 m-0 p-0">
+          {p.state.armor > 0 && (p.state.helmet ? <ShieldCheck size={16} /> : <Shield size={16} />)}
+        </p>
+
         <p className="text-yellow-300">Money: <span className="text-white">${p.state.money}</span></p>
         <p className="text-purple-300">Gun: <span className="text-white">{activeWeapon}</span></p>
-
-        <div className="mt-1 h-1.5 w-full bg-gray-700 rounded">
-          <div
-            className="h-full rounded"
-            style={{
-              width: `${p.state.health}%`,
-              backgroundColor: p.team === "CT" ? "#3b82f6" : "#ef4444",
-            }}
-          ></div>
-        </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
+
 
   return (
     <div className="relative w-screen h-screen bg-transparent text-white">
@@ -158,7 +173,7 @@ const ammoReserve = active?.ammo_reserve ?? 0;
       {/* PLAYER OBSERVADO — CENTRALIZADO */}
       {observed && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center">
-          <h1 className="text-xl font-bold text-yellow-300 mb-1">Observando</h1>
+        
           {renderCharBox(observed, 0)}
         </div>
       )}
